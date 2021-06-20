@@ -1,0 +1,83 @@
+{
+    "help": {
+        "CloudPresets":     "Configuration de chaque Preset de nuage de l'EM",
+        "Temperatures":     "Temperatures typiques par mois",
+        "CloudFormations":  "Presets classe en type de couverture nuageuse",
+        "Probabilities":    "Probabilite de couverture nuageuse. Le dernier chiffre du tableau indique le % de chance d'avoir de la pluie",
+        "Source_Meteo":     "https://fr.weatherspark.com"
+    },
+
+    "CloudPresets": {
+        "Preset0":  {"Name": null, "Base": "2500"},
+        "Preset1":  {"Name": "Preset1", "Base": "2500"},
+        "Preset2":  {"Name": "Preset2", "Base": "2500"},
+        "Preset3":  {"Name": "Preset3", "Base": "2500"},
+        "Preset4":  {"Name": "Preset4", "Base": "2500"},
+        "Preset5":  {"Name": "Preset5", "Base": "4600"},
+        "Preset6":  {"Name": "Preset6", "Base": "2500"},
+        "Preset7":  {"Name": "Preset7", "Base": "2500"},
+        "Preset8":  {"Name": "Preset8", "Base": "5500"},
+        "Preset9":  {"Name": "Preset9", "Base": "2500"},
+        "Preset10": {"Name": "Preset10", "Base": "2500"},
+        "Preset11": {"Name": "Preset11", "Base": "5500"},
+        "Preset12": {"Name": "Preset12", "Base": "3400"},
+        "Preset13": {"Name": "Preset13", "Base": "3400"},
+        "Preset14": {"Name": "Preset14", "Base": "2500"},
+        "Preset15": {"Name": "Preset15", "Base": "4200"},
+        "Preset16": {"Name": "Preset16", "Base": "4200"},
+        "Preset17": {"Name": "Preset17", "Base": "2500"},
+        "Preset18": {"Name": "Preset18", "Base": "3800"},
+        "Preset19": {"Name": "Preset19", "Base": "2900"},
+        "Preset20": {"Name": "Preset20", "Base": "3800"},
+        "Preset21": {"Name": "Preset21", "Base": "2500"},
+        "Preset22": {"Name": "Preset22", "Base": "2500"},
+        "Preset23": {"Name": "Preset23", "Base": "3400"},
+        "Preset24": {"Name": "Preset24", "Base": "2500"},
+        "Preset25": {"Name": "Preset25", "Base": "3400"},
+        "Preset26": {"Name": "Preset26", "Base": "2900"},
+        "Preset27": {"Name": "Preset27", "Base": "2500"},
+        "Preset28": {"Name": "RainyPreset1", "Base": "2900"},
+        "Preset29": {"Name": "RainyPreset2", "Base": "2500"},
+        "Preset30": {"Name": "RainyPreset3", "Base": "1700"}
+    },
+
+    "Temperatures": {
+        "Month1":   {"Caucasus": "11", "PersianGulf": "12"},
+        "Month2":   {"Caucasus": "13", "PersianGulf": "16"},
+        "Month3":   {"Caucasus": "17", "PersianGulf": "21"},
+        "Month4":   {"Caucasus": "20", "PersianGulf": "27"},
+        "Month5":   {"Caucasus": "25", "PersianGulf": "33"},
+        "Month6":   {"Caucasus": "27", "PersianGulf": "37"},
+        "Month7":   {"Caucasus": "28", "PersianGulf": "37"},
+        "Month8":   {"Caucasus": "27", "PersianGulf": "35"},
+        "Month9":   {"Caucasus": "24", "PersianGulf": "30"},
+        "Month10":  {"Caucasus": "18", "PersianGulf": "24"},
+        "Month11":  {"Caucasus": "13", "PersianGulf": "16"},
+        "Month12":  {"Caucasus": "11", "PersianGulf": "13"}
+    },
+
+    "CloudFormations": {
+        "Clear":        [0,1,2],
+        "Light":        [3,4,5,6,7,8],
+        "Scattered":    [9,10,11,12],
+        "Broken":       [13,14,15,16,17,18,19,20],
+        "Overcast":     [21,22,23,24,25,26,27],
+        "Rain":         [28,29,30]
+    },
+
+    "Probabilities": {
+        "Month1":   {"Caucasus": [15,23,40,52,36], "PersianGulf": [55,67,73,80,15]},
+        "Month2":   {"Caucasus": [17,26,40,53,35], "PersianGulf": [58,67,71,80,12]},
+        "Month3":   {"Caucasus": [19,28,39,55,29], "PersianGulf": [52,62,70,77,12]},
+        "Month4":   {"Caucasus": [21,30,42,57,28], "PersianGulf": [50,58,66,73,11]},
+        "Month5":   {"Caucasus": [26,40,52,68,24], "PersianGulf": [66,75,80,85,4]},
+        "Month6":   {"Caucasus": [42,60,73,84,27], "PersianGulf": [92,97,98,99,1]},
+        "Month7":   {"Caucasus": [56,81,91,97,25], "PersianGulf": [80,90,95,98,1]},
+        "Month8":   {"Caucasus": [60,84,90,97,28], "PersianGulf": [80,90,95,98,1]},
+        "Month9":   {"Caucasus": [46,65,77,86,31], "PersianGulf": [90,96,98,99,0]},
+        "Month10":  {"Caucasus": [30,42,57,70,35], "PersianGulf": [76,83,88,90,6]},
+        "Month11":  {"Caucasus": [22,31,40,58,32], "PersianGulf": [56,65,73,79,13]},
+        "Month12":  {"Caucasus": [20,27,40,56,35], "PersianGulf": [53,62,70,78,12]}
+    }
+
+}
