@@ -1,5 +1,7 @@
-# IRRE-CampagneAAA
+# DCS-Random-Weather
 
-Ajouter [MOOSE Static](https://github.com/FlightControl-Master/MOOSE_INCLUDE/blob/develop/Moose_Include_Static/Moose.lua) en MISSION START // DO SCRIPT FILE à la place du DO SCRIPT
+Weather data from https://fr.weatherspark.com/
 
-Ajouter le fichier Campagne_AAA_Master.lua en ONCE // DO SCRIPT FILE à la place du DO SCRIPT
+Works for Caucasus and PersianGulf only
+
+Usage : DCS-Random-Weather.ps1 -MizPath "Path to the .miz file

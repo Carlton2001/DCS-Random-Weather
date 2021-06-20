@@ -1,5 +1,4 @@
 param ([string]$MizPath)
-$MizPath = "$PSScriptRoot\Training_Map_PersianGulf.miz"
 
 Clear-Host
 
