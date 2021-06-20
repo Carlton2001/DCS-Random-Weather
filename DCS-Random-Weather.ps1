@@ -1,6 +1,7 @@
-param ([string]$MizPath)
-
-Clear-Host
+param (
+    [Parameter(Position=0,mandatory=$true)]
+    [string]$MizPath
+)
 
 #region Fonctions
 
@@ -20,11 +21,20 @@ Clear-Host
         return $resultUnzip
     }
 
+    function WindsInverter ([int]$Wind) {
+        $test = $Wind + 180
+        if ($test -ge 360) { return $Wind - 180 }
+        else { return $test }
+    }
+
+    function SpeedKts ([int]$Speed) {
+        return [math]::Round($Speed*1.944)
+    }
+
     function Random_Date {
         $dateMin = get-date -year 2020 -month 1 -day 1
         $dateMax = get-date -year 2021 -month 1 -day 1 
-        $randomDate = (New-Object DateTime (Get-Random -min $dateMin.ticks -max $dateMax.ticks)).ToString("yyyy.M.d")
-        return $randomDate
+        return New-Object DateTime (Get-Random -min $dateMin.ticks -max $dateMax.ticks)
     }
 
     function Random_Temp ($Temp) {
@@ -79,7 +89,8 @@ Clear-Host
     $ScriptHT.extractFolder = "$PSScriptRoot\extractFolder"
     $ScriptHT.MissionNew = New-Object System.Collections.ArrayList
     $ScriptHT.SevenZip = "$($env:ProgramFiles)\7-Zip\7z.exe"
-
+    $ScriptHT.DiscordWebhook = "$PSScriptRoot\DiscordSendWebhook.exe"
+    $ScriptHT.DiscordLink = Get-Content "$PSScriptRoot\Discord.api"
 
     # Création du répertoire d'extraction si inexistant
     if (!(Test-Path $ScriptHT.extractFolder)) {
@@ -108,13 +119,13 @@ if ($unzipFile) {
 
         # Date
         $randomDate = Random_Date
-        $year   = $randomDate.Split('.')[0]
-        $month  = $randomDate.Split('.')[1]
-        $day    = $randomDate.Split('.')[2]
+        $year   = $randomDate.Year.ToString()
+        $month  = $randomDate.Month.ToString()
+        $day    = $randomDate.Day.ToString()
         $MonthConfig = "Month$month"
 
         # Winds Speed & Direction
-        $WindSpeedGround    = (Get-Random -Minimum 3 -Maximum 15).ToString() # Beaufort 3-6
+        $WindSpeedGround    = (Get-Random -Minimum 2 -Maximum 15).ToString() # Beaufort 2-6
         $WindDirGround      = (Get-Random -Maximum 360).ToString()
         $WindSpeed2000      = (Get-Random -Minimum 14 -Maximum 30).ToString() # Beaufort 7-10
         $WindDir2000        = (Get-Random -Maximum 360).ToString()
@@ -138,6 +149,16 @@ if ($unzipFile) {
         Write-Host "Winds : $WindSpeedGround m/s @ $WindDirGround - $WindSpeed2000 m/s @ $WindDir2000 - $WindSpeed8000 m/s @ $WindDir8000"
         Write-Host "Turbulences : $groundTurbulence"
         Write-Host "Cloud : $CloudsPreset"
+
+        # Discord
+        if ($CloudsPreset) {
+            $CloudsInformations = ("{0}[]({1})" -f $ScriptHT.Config.CloudPresets.$Preset.Metar, $ScriptHT.Config.CloudPresets.$Preset.Image)
+        }
+        else {
+            $CloudsInformations = "Temps Clair, pas de nuage"
+        }
+        $DiscordMessage = ("{0} **Votre meteo de la journee pour {1}**\nNous sommes le {2} {3} {4}, il fait {5} degres\n__Vents__ :\nAu sol : {6} kts du {7}\n2000m : {8} kts du {9}\n8000m : {10} kts du {11}\nTurbulences : {12} kts\n__Nuages__ :\n" -f $ScriptHT.Config.Discord.$($ScriptHT.Theatre).Flag, $ScriptHT.Config.Discord.$($ScriptHT.Theatre).City, $day, $ScriptHT.Config.FrenchDates.$month, $year, $Temperature, $(SpeedKts $WindSpeedGround), $(WindsInverter $WindDirGround), $(SpeedKts $WindSpeed2000), $(WindsInverter $WindDir2000), $(SpeedKts $WindSpeed8000), $(WindsInverter $WindDir8000), $($(SpeedKts $groundTurbulence)/10))
+        $DiscordMessage = $DiscordMessage + $CloudsInformations
 
     #endregion
 
@@ -220,10 +241,15 @@ if ($unzipFile) {
         $zipFile = Zip_File -ZipFile $ScriptHT.MizPath -DestFolder $ScriptHT.extractFolder
         if ($zipFile) {
             Write-Host "Fichier Miz mis a jour" -ForegroundColor "Green"
+            # Discord Message
+            $DiscordSent = Invoke-Expression -Command ".`"$($ScriptHT.DiscordWebhook)`" -m `"$DiscordMessage`" -n `"$($ScriptHT.Config.Discord.BotName)`" -a $($ScriptHT.Config.Discord.BotAvatar) -w $($ScriptHT.DiscordLink)"
         }
         else {
             Write-Host "Echec de mise a jour du Miz" -ForegroundColor "Red"
+            # Discord Message
+            $DiscordSent = Invoke-Expression -Command ".`"$($ScriptHT.DiscordWebhook)`" -m `"Probleme de generation de la mission $($ScriptHT.MizFile)`" -n `"IRRE_Serveur`" -w $($ScriptHT.DiscordLink)"
         }
+        Write-Host "Message Discord Envoyé" -ForegroundColor "Yellow"
 
     #endregion
 
