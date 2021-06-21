@@ -1,6 +1,7 @@
-param (
-    [Parameter(Position=0,mandatory=$true)]
-    [string]$MizPath
+﻿param (
+    #[Parameter(Position=0,mandatory=$true)]
+    [string]$MizPath,
+    [switch]$Discord
 )
 
 #region Fonctions
@@ -77,11 +78,80 @@ param (
         return $FormationType[$rand].ToString()
     }
 
+    function SendDiscord ([switch]$Fail) {
+        <# References
+            https://www.gngrninja.com/script-ninja/2018/3/10/using-discord-webhooks-with-powershell
+            https://www.gngrninja.com/script-ninja/2018/3/17/using-discord-webhooks-and-embeds-with-powershell-part-2
+            https://discord.com/developers/docs/resources/webhook#execute-webhook
+        #>
+
+        $embedArray = New-Object System.Collections.ArrayList
+        $fields = New-Object System.Collections.ArrayList
+
+        if ($Fail) {       
+            $payload = [PSCustomObject]@{
+                content = "Problème dans la génération de la mission $($ScriptHT.MizFile)"
+                username = $ScriptHT.Config.Discord.ServerName
+            }
+            Invoke-RestMethod -Uri $ScriptHT.DiscordLink -Method Post -Body ($payload | ConvertTo-Json) -ContentType 'Application/Json; Charset=utf-8'
+        }
+        else {
+            [void]$fields.Add([PSCustomObject]@{
+                name = "Vent au sol"
+                value = "$(SpeedKts $RandomHT.WindSpeedGround) kts du $($RandomHT.WindDirGround)"
+                inline = $true
+            })
+            [void]$fields.Add([PSCustomObject]@{
+                name = "2000m"
+                value = "$(SpeedKts $RandomHT.WindSpeed2K) kts du $($RandomHT.WindDir2000)"
+                inline = $true
+            })
+            [void]$fields.Add([PSCustomObject]@{
+                name = "8000m"
+                value = "$(SpeedKts $RandomHT.WindSpeed8K) kts du $($RandomHT.WindDir8000)"
+                inline = $true
+            })
+            [void]$fields.Add([PSCustomObject]@{
+                name = "Turbulences"
+                value = "$($(SpeedKts $RandomHT.Turbulence)/10) kts"
+                inline = $false
+            })
+            [void]$fields.Add([PSCustomObject]@{
+                name = "Nuages"
+                value = $ScriptHT.Config.CloudPresets.$($RandomHT.Preset).Description
+                inline = $false
+            })
+            if ($RandomHT.Preset -ne "Preset0") {
+                [void]$fields.Add([PSCustomObject]@{
+                    name = "METAR"
+                    value = $ScriptHT.Config.CloudPresets.$($RandomHT.Preset).Metar
+                    inline = $false
+                })
+            }
+            $image = [PSCustomObject]@{url = $ScriptHT.Config.CloudPresets.$($RandomHT.Preset).Image}
+            [void]$embedArray.Add([PSCustomObject]@{
+                color = $ScriptHT.Config.Discord.$($ScriptHT.Theatre).ThumbColor
+                title = "Météo du jour à $($ScriptHT.Config.Discord.$($ScriptHT.Theatre).City)"
+                description = "$($ScriptHT.Config.Discord.$($ScriptHT.Theatre).Flag) Nous sommes le $($RandomHT.Day) $($ScriptHT.Config.CultureMonths.$($RandomHT.Month)) $($RandomHT.Year), il fait $($($RandomHT.Temperature))°C"
+                fields = $fields
+                image = $image
+            })
+            $payload = [PSCustomObject]@{
+                embeds = $embedArray
+                username = $ScriptHT.Config.Discord.BotName
+                avatar_url = $ScriptHT.Config.Discord.BotAvatar
+            }
+            Invoke-RestMethod -Uri $ScriptHT.DiscordLink -Body ($payload | ConvertTo-Json -Depth 4) -Method Post -ContentType 'Application/Json; Charset=utf-8'
+        }
+
+    }
+
 #endregion
 
 #region Initialisations
 
     # Définition des variables
+    $RandomHT = [hashtable]::Synchronized(@{})
     $ScriptHT = [hashtable]::Synchronized(@{})
     $ScriptHT.Config = Get-Content "$PSScriptRoot\DCS-Random-Weather.json" | ConvertFrom-Json
     $ScriptHT.MizPath = $MizPath
@@ -89,7 +159,6 @@ param (
     $ScriptHT.extractFolder = "$PSScriptRoot\extractFolder"
     $ScriptHT.MissionNew = New-Object System.Collections.ArrayList
     $ScriptHT.SevenZip = "$($env:ProgramFiles)\7-Zip\7z.exe"
-    $ScriptHT.DiscordWebhook = "$PSScriptRoot\DiscordSendWebhook.exe"
     $ScriptHT.DiscordLink = Get-Content "$PSScriptRoot\Discord.api"
 
     # Création du répertoire d'extraction si inexistant
@@ -118,47 +187,38 @@ if ($unzipFile) {
     #region Randomization
 
         # Date
-        $randomDate = Random_Date
-        $year   = $randomDate.Year.ToString()
-        $month  = $randomDate.Month.ToString()
-        $day    = $randomDate.Day.ToString()
-        $MonthConfig = "Month$month"
+        $RandomHT.Date  = Random_Date
+        $RandomHT.Year  = $RandomHT.Date.Year.ToString()
+        $RandomHT.Month = $RandomHT.Date.Month.ToString()
+        $RandomHT.Day   = $RandomHT.Date.Day.ToString()
+        $MonthConfig = "Month$($RandomHT.Month)"
 
         # Winds Speed & Direction
-        $WindSpeedGround    = (Get-Random -Minimum 2 -Maximum 15).ToString() # Beaufort 2-6
-        $WindDirGround      = (Get-Random -Maximum 360).ToString()
-        $WindSpeed2000      = (Get-Random -Minimum 14 -Maximum 30).ToString() # Beaufort 7-10
-        $WindDir2000        = (Get-Random -Maximum 360).ToString()
-        $WindSpeed8000      = (Get-Random -Minimum 14 -Maximum 26).ToString() # Beaufort 7-9
-        $WindDir8000        = (Get-Random -Maximum 360).ToString()
+        $RandomHT.WindSpeedGround   = (Get-Random -Minimum 2 -Maximum 15).ToString() # Beaufort 2-6
+        $RandomHT.WindDirGround     = (Get-Random -Maximum 360).ToString()
+        $RandomHT.WindSpeed2K       = (Get-Random -Minimum 2 -Maximum 15).ToString() # Beaufort 2-6
+        $RandomHT.WindDir2000       = (Get-Random -Maximum 360).ToString()
+        $RandomHT.WindSpeed8K       = (Get-Random -Minimum 2 -Maximum 15).ToString() # Beaufort 2-6
+        $RandomHT.WindDir8000       = (Get-Random -Maximum 360).ToString()
 
         # Turbulences
-        $groundTurbulence = (Get-Random -Minimum 5 -Maximum 21).ToString()
+        $RandomHT.Turbulence = (Get-Random -Minimum 5 -Maximum 21).ToString()
 
         # Temperature
-        $Temperature = Random_Temp $ScriptHT.Config.Temperatures.$MonthConfig.$($ScriptHT.Theatre)
+        $RandomHT.Temperature = Random_Temp $ScriptHT.Config.Temperatures.$MonthConfig.$($ScriptHT.Theatre)
 
         # Preset Cloud
         $Preset = "Preset$(Get_CloudFormation $MonthConfig)"
+        $RandomHT.Preset = $Preset
         $CloudsPreset = $ScriptHT.Config.CloudPresets.$Preset.Name
         $Cloudsbase = $ScriptHT.Config.CloudPresets.$Preset.Base
 
         # Informations
-        Write-Host "Date : $randomDate"
-        Write-Host "Temperature : $Temperature"
-        Write-Host "Winds : $WindSpeedGround m/s @ $WindDirGround - $WindSpeed2000 m/s @ $WindDir2000 - $WindSpeed8000 m/s @ $WindDir8000"
-        Write-Host "Turbulences : $groundTurbulence"
+        Write-Host "Date : $($RandomHT.Date)"
+        Write-Host "Temperature : $($RandomHT.Temperature)"
+        Write-Host "Winds : $($RandomHT.WindSpeedGround) m/s @ $($RandomHT.WindDirGround) - $($RandomHT.WindSpeed2K) m/s @ $($RandomHT.WindDir2000) - $($RandomHT.WindSpeed8K) m/s @ $($RandomHT.WindDir8000)"
+        Write-Host "Turbulences : $($RandomHT.Turbulence)"
         Write-Host "Cloud : $CloudsPreset"
-
-        # Discord
-        if ($CloudsPreset) {
-            $CloudsInformations = ("{0}[]({1})" -f $ScriptHT.Config.CloudPresets.$Preset.Metar, $ScriptHT.Config.CloudPresets.$Preset.Image)
-        }
-        else {
-            $CloudsInformations = "Temps Clair, pas de nuage"
-        }
-        $DiscordMessage = ("{0} **Votre meteo de la journee pour {1}**\nNous sommes le {2} {3} {4}, il fait {5} degres\n__Vents__ :\nAu sol : {6} kts du {7}\n2000m : {8} kts du {9}\n8000m : {10} kts du {11}\nTurbulences : {12} kts\n__Nuages__ :\n" -f $ScriptHT.Config.Discord.$($ScriptHT.Theatre).Flag, $ScriptHT.Config.Discord.$($ScriptHT.Theatre).City, $day, $ScriptHT.Config.FrenchDates.$month, $year, $Temperature, $(SpeedKts $WindSpeedGround), $(WindsInverter $WindDirGround), $(SpeedKts $WindSpeed2000), $(WindsInverter $WindDir2000), $(SpeedKts $WindSpeed8000), $(WindsInverter $WindDir8000), $($(SpeedKts $groundTurbulence)/10))
-        $DiscordMessage = $DiscordMessage + $CloudsInformations
 
     #endregion
 
@@ -169,9 +229,9 @@ if ($unzipFile) {
             if ($ScriptHT.Mission[$i] -match [regex]::escape('["date"]')) {
                 [void]$ScriptHT.MissionNew.Add("    [`"date`"] = ")
                 [void]$ScriptHT.MissionNew.Add("    {")
-                [void]$ScriptHT.MissionNew.Add("        [`"Day`"] = $day,")
-                [void]$ScriptHT.MissionNew.Add("        [`"Year`"] = $year,")
-                [void]$ScriptHT.MissionNew.Add("        [`"Month`"] = $month,")
+                [void]$ScriptHT.MissionNew.Add("        [`"Day`"] = $($RandomHT.Day),")
+                [void]$ScriptHT.MissionNew.Add("        [`"Year`"] = $($RandomHT.Year),")
+                [void]$ScriptHT.MissionNew.Add("        [`"Month`"] = $($RandomHT.Month),")
                 [void]$ScriptHT.MissionNew.Add("    }, -- end of [`"date`"]")
                 $i = $i+5
             }
@@ -181,29 +241,29 @@ if ($unzipFile) {
                 [void]$ScriptHT.MissionNew.Add("        {")
                 [void]$ScriptHT.MissionNew.Add("            [`"at8000`"] = ")
                 [void]$ScriptHT.MissionNew.Add("            {")
-                [void]$ScriptHT.MissionNew.Add("                [`"speed`"] = $WindSpeed8000,")
-                [void]$ScriptHT.MissionNew.Add("                [`"dir`"] = $WindDir8000,")
+                [void]$ScriptHT.MissionNew.Add("                [`"speed`"] = $($RandomHT.WindSpeed8K),")
+                [void]$ScriptHT.MissionNew.Add("                [`"dir`"] = $($RandomHT.WindDir8000),")
                 [void]$ScriptHT.MissionNew.Add("            }, -- end of [`"at8000`"]")
                 [void]$ScriptHT.MissionNew.Add("            [`"at2000`"] = ")
                 [void]$ScriptHT.MissionNew.Add("            {")
-                [void]$ScriptHT.MissionNew.Add("                [`"speed`"] = $WindSpeed2000,")
-                [void]$ScriptHT.MissionNew.Add("                [`"dir`"] = $WindDir2000,")
+                [void]$ScriptHT.MissionNew.Add("                [`"speed`"] = $($RandomHT.WindSpeed2K),")
+                [void]$ScriptHT.MissionNew.Add("                [`"dir`"] = $($RandomHT.WindDir2000),")
                 [void]$ScriptHT.MissionNew.Add("            }, -- end of [`"at2000`"]")
                 [void]$ScriptHT.MissionNew.Add("            [`"atGround`"] = ")
                 [void]$ScriptHT.MissionNew.Add("            {")
-                [void]$ScriptHT.MissionNew.Add("                [`"speed`"] = $WindSpeedGround,")
-                [void]$ScriptHT.MissionNew.Add("                [`"dir`"] = $WindDirGround,")
+                [void]$ScriptHT.MissionNew.Add("                [`"speed`"] = $($RandomHT.WindSpeedGround),")
+                [void]$ScriptHT.MissionNew.Add("                [`"dir`"] = $($RandomHT.WindDirGround),")
                 [void]$ScriptHT.MissionNew.Add("            }, -- end of [`"atGround`"]")
                 [void]$ScriptHT.MissionNew.Add("        }, -- end of [`"wind`"]")
                 $i = $i+17
             }
             # Turbulence
             elseif ($ScriptHT.Mission[$i] -match [regex]::escape('"groundTurbulence"')){
-                [void]$ScriptHT.MissionNew.Add("        [`"groundTurbulence`"] = $groundTurbulence,")
+                [void]$ScriptHT.MissionNew.Add("        [`"groundTurbulence`"] = $($RandomHT.Turbulence),")
             }
             # Temperature
             elseif ($ScriptHT.Mission[$i] -match [regex]::escape('"temperature"')){
-                [void]$ScriptHT.MissionNew.Add("            [`"temperature`"] = $Temperature,")
+                [void]$ScriptHT.MissionNew.Add("            [`"temperature`"] = $($RandomHT.Temperature),")
             }
             # Clouds
             elseif ($ScriptHT.Mission[$i] -match [regex]::escape('["clouds"]')) {
@@ -242,14 +302,19 @@ if ($unzipFile) {
         if ($zipFile) {
             Write-Host "Fichier Miz mis a jour" -ForegroundColor "Green"
             # Discord Message
-            $DiscordSent = Invoke-Expression -Command ".`"$($ScriptHT.DiscordWebhook)`" -m `"$DiscordMessage`" -n `"$($ScriptHT.Config.Discord.BotName)`" -a $($ScriptHT.Config.Discord.BotAvatar) -w $($ScriptHT.DiscordLink)"
+            if ($Discord) {
+                SendDiscord
+                Write-Host "Message Discord Envoyé" -ForegroundColor "Yellow"
+            }
         }
         else {
             Write-Host "Echec de mise a jour du Miz" -ForegroundColor "Red"
             # Discord Message
-            $DiscordSent = Invoke-Expression -Command ".`"$($ScriptHT.DiscordWebhook)`" -m `"Probleme de generation de la mission $($ScriptHT.MizFile)`" -n `"IRRE_Serveur`" -w $($ScriptHT.DiscordLink)"
+            if ($Discord) {
+                SendDiscord -Fail
+                Write-Host "Message Discord Envoyé" -ForegroundColor "Yellow"
+            }
         }
-        Write-Host "Message Discord Envoyé" -ForegroundColor "Yellow"
 
     #endregion
 
