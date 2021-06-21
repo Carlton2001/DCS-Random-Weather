@@ -1,5 +1,5 @@
 ﻿param (
-    #[Parameter(Position=0,mandatory=$true)]
+    [Parameter(Position=0,mandatory=$true)]
     [string]$MizPath,
     [switch]$Discord
 )
