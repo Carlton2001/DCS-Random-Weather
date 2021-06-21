@@ -97,7 +97,7 @@
         }
         else {
             [void]$fields.Add([PSCustomObject]@{
-                name = "Vent au sol"
+                name = "Vent à 0m"
                 value = "$(SpeedKts $RandomHT.WindSpeedGround) kts du $($RandomHT.WindDirGround)"
                 inline = $true
             })
