@@ -194,7 +194,7 @@ if ($unzipFile) {
         $MonthConfig = "Month$($RandomHT.Month)"
 
         # Winds Speed & Direction
-        $RandomHT.WindSpeedGround   = (Get-Random -Minimum 2 -Maximum 15).ToString() # Beaufort 2-6
+        $RandomHT.WindSpeedGround   = (Get-Random -Minimum 2 -Maximum 9).ToString() # Beaufort 2-4
         $RandomHT.WindDirGround     = (Get-Random -Maximum 360).ToString()
         $RandomHT.WindSpeed2K       = (Get-Random -Minimum 2 -Maximum 15).ToString() # Beaufort 2-6
         $RandomHT.WindDir2000       = (Get-Random -Maximum 360).ToString()
