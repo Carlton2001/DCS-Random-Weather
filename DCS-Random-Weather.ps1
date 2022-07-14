@@ -85,6 +85,8 @@
             https://discord.com/developers/docs/resources/webhook#execute-webhook
         #>
 
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
         $embedArray = New-Object System.Collections.ArrayList
         $fields = New-Object System.Collections.ArrayList
 
