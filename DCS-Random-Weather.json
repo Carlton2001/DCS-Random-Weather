@@ -42,18 +42,18 @@
     },
 
     "Temperatures": {
-        "Month1":   {"Caucasus": "11", "PersianGulf": "12"},
-        "Month2":   {"Caucasus": "13", "PersianGulf": "16"},
-        "Month3":   {"Caucasus": "17", "PersianGulf": "21"},
-        "Month4":   {"Caucasus": "20", "PersianGulf": "27"},
-        "Month5":   {"Caucasus": "25", "PersianGulf": "33"},
-        "Month6":   {"Caucasus": "27", "PersianGulf": "37"},
-        "Month7":   {"Caucasus": "28", "PersianGulf": "37"},
-        "Month8":   {"Caucasus": "27", "PersianGulf": "35"},
-        "Month9":   {"Caucasus": "24", "PersianGulf": "30"},
-        "Month10":  {"Caucasus": "18", "PersianGulf": "24"},
-        "Month11":  {"Caucasus": "13", "PersianGulf": "16"},
-        "Month12":  {"Caucasus": "11", "PersianGulf": "13"}
+        "Month1":   {"Caucasus": "7",   "PersianGulf": "6",     "Syria": "6"},
+        "Month2":   {"Caucasus": "7",   "PersianGulf": "8",     "Syria": "8"},
+        "Month3":   {"Caucasus": "9",   "PersianGulf": "12",    "Syria": "11"},
+        "Month4":   {"Caucasus": "14",  "PersianGulf": "18",    "Syria": "16"},
+        "Month5":   {"Caucasus": "18",  "PersianGulf": "24",    "Syria": "20"},
+        "Month6":   {"Caucasus": "21",  "PersianGulf": "28",    "Syria": "24"},
+        "Month7":   {"Caucasus": "24",  "PersianGulf": "30",    "Syria": "27"},
+        "Month8":   {"Caucasus": "24",  "PersianGulf": "29",    "Syria": "27"},
+        "Month9":   {"Caucasus": "21",  "PersianGulf": "25",    "Syria": "24"},
+        "Month10":  {"Caucasus": "17",  "PersianGulf": "19",    "Syria": "19"},
+        "Month11":  {"Caucasus": "12",  "PersianGulf": "12",    "Syria": "12"},
+        "Month12":  {"Caucasus": "8",   "PersianGulf": "8",     "Syria": "7"}
     },
 
     "CloudFormations": {
@@ -66,23 +66,24 @@
     },
 
     "Probabilities": {
-        "Month1":   {"Caucasus": [15,23,40,52,36], "PersianGulf": [55,67,73,80,15]},
-        "Month2":   {"Caucasus": [17,26,40,53,35], "PersianGulf": [58,67,71,80,12]},
-        "Month3":   {"Caucasus": [19,28,39,55,29], "PersianGulf": [52,62,70,77,12]},
-        "Month4":   {"Caucasus": [21,30,42,57,28], "PersianGulf": [50,58,66,73,11]},
-        "Month5":   {"Caucasus": [26,40,52,68,24], "PersianGulf": [66,75,80,85,4]},
-        "Month6":   {"Caucasus": [42,60,73,84,27], "PersianGulf": [92,97,98,99,1]},
-        "Month7":   {"Caucasus": [56,81,91,97,25], "PersianGulf": [80,90,95,98,1]},
-        "Month8":   {"Caucasus": [60,84,90,97,28], "PersianGulf": [80,90,95,98,1]},
-        "Month9":   {"Caucasus": [46,65,77,86,31], "PersianGulf": [90,96,98,99,0]},
-        "Month10":  {"Caucasus": [30,42,57,70,35], "PersianGulf": [76,83,88,90,6]},
-        "Month11":  {"Caucasus": [22,31,40,58,32], "PersianGulf": [56,65,73,79,13]},
-        "Month12":  {"Caucasus": [20,27,40,56,35], "PersianGulf": [53,62,70,78,12]}
+        "Month1":   {"Caucasus": [15,23,40,52,36],  "PersianGulf": [55,67,73,80,15],    "Syria": [38,52,65,76,19]},
+        "Month2":   {"Caucasus": [17,26,40,53,35],  "PersianGulf": [58,67,71,80,12],    "Syria": [40,52,67,80,22]},
+        "Month3":   {"Caucasus": [19,28,39,55,29],  "PersianGulf": [52,62,70,77,12],    "Syria": [45,58,70,80,17]},
+        "Month4":   {"Caucasus": [21,30,42,57,28],  "PersianGulf": [50,58,66,73,11],    "Syria": [50,62,72,79,10]},
+        "Month5":   {"Caucasus": [26,40,52,68,24],  "PersianGulf": [66,75,80,85,4],     "Syria": [62,73,80,85,5]},
+        "Month6":   {"Caucasus": [42,60,73,84,27],  "PersianGulf": [92,97,98,99,1],     "Syria": [95,96,97,100,1]},
+        "Month7":   {"Caucasus": [56,81,91,97,25],  "PersianGulf": [80,90,95,98,1],     "Syria": [97,98,99,100,0]},
+        "Month8":   {"Caucasus": [60,84,90,97,28],  "PersianGulf": [80,90,95,98,1],     "Syria": [97,98,99,100,0]},
+        "Month9":   {"Caucasus": [46,65,77,86,31],  "PersianGulf": [90,96,98,99,0],     "Syria": [94,97,99,100,0]},
+        "Month10":  {"Caucasus": [30,42,57,70,35],  "PersianGulf": [76,83,88,90,6],     "Syria": [63,75,81,88,2]},
+        "Month11":  {"Caucasus": [22,31,40,58,32],  "PersianGulf": [56,65,73,79,13],    "Syria": [45,60,71,78,12]},
+        "Month12":  {"Caucasus": [20,27,40,56,35],  "PersianGulf": [53,62,70,78,12],    "Syria": [35,50,63,75,16]}
     },
 
     "Discord": {
         "Caucasus":     {"Flag": ":flag_ge:",   "ThumbColor": 15158332, "City": "Senaki-Kolkhi"},
         "PersianGulf":  {"Flag": ":flag_ir:",   "ThumbColor": 2067276,  "City": "Chiraz"},
+        "Syria":        {"Flag": ":flag_sy:",   "ThumbColor": 2067276,  "City": "Damas"},
         "ServerName":   "IRRE_Serveur",
         "BotName":      "Evelyne Dheliat",
         "BotAvatar":    "https://i.ibb.co/R0vsxf7/Evelyne-Dhelia.jpg"
