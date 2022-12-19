@@ -33,8 +33,8 @@
     }
 
     function Random_Date {
-        $dateMin = get-date -year 2020 -month 1 -day 1
-        $dateMax = get-date -year 2021 -month 1 -day 1 
+        $dateMin = get-date -year 2022 -month 1 -day 1
+        $dateMax = get-date -year 2023 -month 1 -day 1 
         return New-Object DateTime (Get-Random -min $dateMin.ticks -max $dateMax.ticks)
     }
 
